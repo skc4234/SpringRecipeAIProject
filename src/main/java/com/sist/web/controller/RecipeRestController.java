@@ -13,6 +13,52 @@ import com.sist.web.service.RecipeService;
 import lombok.RequiredArgsConstructor;
 import java.util.*;
 
+/*
+ *   1. 전체 동작 과정
+ *     <브라우저> : HTML / JavaScript(바닐라 JS)
+ *        | => 재료 선택
+ *    Thymeleaf
+ *        | => Post '/recipe/recommend'
+ *    RecipeController
+ *        | @GetMapping("/recipe/recommand") => 화면 UI
+ *        | @PostMapping("/recipe/recommand") => 데이터 전송
+ *        | @ResponseBody: VO=>JSON/문자열로 변경해서 전송
+ *        |  ==> +@Controller => @RestController
+ *        | ingredients(재료) 전달
+ *     RecipeService
+ *        | 1) 재료 존재 여부 확인
+ *        | 2) 검색문장 생성
+ *        | 3) EmbeddingModel 생성
+ *        | 4) String => float[] 변경(vector)
+ *        | 5) PostgreSQL+pgVector => 유사 검색(Like)
+ *        | 6) 레시피에서 content 추출
+ *        | 7) 냉장고 <=> 레시피 재료 비교
+ *        | 8) 재료 상태 결정(부족, 만족 등)
+ *        | 9) 재료 충족률 계산
+ *    주문 레시피 List(Limit 5)
+ *    -----------------------
+ *     => 보유 재료
+ *        부족 재료
+ *        재료 충족률
+ *        레시피명
+ *        조리방법
+ *        요리 종류
+ *        조리 과정
+ *    ---------------------
+ *        |
+ *    Thymeleaf 화면
+ *     => HTML => Controller => RecipeService
+ *        ------------------- Spring AI
+ *        => EmbeddingModel = PostgreSQL+pgVector
+ *        => 유사 레시피 검색
+ *        => 재료 확인
+ *        -----------------> HTML에서 출력
+ *        
+ *    1. JavaScript => Pinia
+ *    2. @ResponseBody => @RestController
+ *    3. @Tool => Tool Calling(프롬프트)    
+ */
+
 @RestController
 @RequestMapping("/recipe")
 @RequiredArgsConstructor
