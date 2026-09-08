@@ -6,33 +6,35 @@ pipeline {
 	}
 	stages {
 		/*
-			git push => commit (main)
-			   |
-			web hook / poll
-			   |
-			 Jenkins (local) = EC2
-			   |
-			 build
-			   |
-			 docker build
-			 docker push
-			   |
-			 docker pull
-			 docker run
+		    git push = commit (main) 
+		       |
+		    web hook / poll
+		       |
+		     Jenkins (local) = EC2
+		       |
+		     build 
+		       |
+		     docker build 
+		     docker push 
+		        |
+		     docker pull 
+		     docker run
+		     
+		     -name: = stage 
+		      run: 명령어 => steps
 		*/
 		/*
-			Repository: 소스파일 => Git URL
+		    Repository : 소스파일 => Git URL
 		*/
-		stage('Check Out'){ // git actions의 name:
-			steps { // git actions의 run:
+		stage('Check Out') {
+			steps {
 				echo 'Git Checkout'
 				checkout scm
 			}
 		}
-		
-		// 환경설정 파일 추가
-		stage('Create .env'){
-			steps{
+		// 임시 
+		stage('Create .env') {
+			steps {
 				withCredentials([
 					string(
 						credentialsId: 'post-url',
@@ -40,104 +42,99 @@ pipeline {
 					),
 					string(
 						credentialsId: 'gen-key',
-						variable: 'GEN_KEY'			
+						variable: 'GEN_KEY'
 					)
-				]) {
+				]){
 					sh '''
-						SPRING_PROFILES_ACTIVE=prod > .env
-						POST_URL=${POST_URL} >> .env
-						GEN_KEY=${GEN_KEY} >> .env
-						chmod 600 .env
-					'''
+				        echo "SPRING_PROFILES_ACTIVE=prod" > .env
+			            echo "POST_URL=${POST_URL}" >> .env
+			            echo "GEN_KEY=${GEN_KEY}" >> .env
+			            
+			            chmod 600 .env
+					   '''
 				}
 			}
 		}
-		
-		// gradlew build 전 permission 처리
-		stage('Gradlew permission'){
-			steps{
+		// gradlew build => permission  처리 
+		stage('Gradlew Permission'){
+			steps {
 				sh '''
-					chmod +x gradlew 	
-				'''
+				    chmod +x gradlew
+				   '''
 			}
 		}
 		
 		// gradlew build
-		stage('Gradlew build'){
-			steps{
+		stage('Gradlew Build'){
+			steps {
 				sh '''
-					./gradlew clean build -x test
-				'''
+				    ./gradlew clean build -x test
+				   '''
 			}
 		}
-		
-		// docker container 생성
+		// Docker Build 
 		stage('Docker Build'){
-			steps{
+			steps {
 				sh '''
-					docker build -t skc4234/ai-app:latest . 	
-				'''
+				     docker build -t chaijewon/ai-app:latest .
+				   '''
 			}
 		}
-		
-		// dockerhub login
-		stage('Dockerhub Login'){
-			steps{
+		// DockerHub Login
+		stage('DockerHub Login'){
+			steps {
 				withCredentials([usernamePassword(
-					credentialsId:'dockerhub_info',
-					usernameVariable:'DH_USER',
-					passwordVariable:'DH_PASS'
-				)]) {
+					credentialsId: 'dockerhub_info',
+					usernameVariable: 'DH_USER',
+					passwordVariable: 'DH_PASS'
+				)]){
 					sh '''
-						echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-					'''
+					    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+					   '''
 				}
 			}
 		}
 		
-		// docker hub에 push
 		stage('Docker Push'){
-			steps{
+			steps {
 				sh '''
-					docker push skc4234/ai-app:latest
-				'''
+				    docker push chaijewon/ai-app:latest
+				   '''
 			}
 		}
 		
-		// Container Stop
 		stage('Container Stop'){
-			steps{
+			steps {
 				sh '''
-					docker stop ai-app || true
-				'''
+				    docker stop ai-app || true
+				   '''
 			}
 		}
 		
-		// Container Remove
 		stage('Container Remove'){
-			steps{
+			steps {
 				sh '''
-					docker rm ai-app || true
-				'''
+				    docker rm ai-app || true
+				   '''
 			}
 		}
 		
-		// Dockerhub Pull
-		stage('Dockerhub Pull'){
-			steps{
+		stage('DockerHub Pull'){
+			steps {
 				sh '''
-					docker pull skc4234/ai-app:latest
-				'''
+				    docker pull chaijewon/ai-app:latest
+				   '''
 			}
 		}
 		
-		// Container Remove
 		stage('Docker Run'){
-			steps{
+			steps {
 				sh '''
-					docker run -d --name ai-app --env-file .env -p 9090:9090 skc4234/ai-app:latest || true
-				'''
+				     docker run -d --name ai-app -p 9090:9090 --env-file .env chaijewon/ai-app:latest
+				   '''
 			}
 		}
+		
+		
 	}
 }
