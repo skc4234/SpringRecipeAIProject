@@ -1,0 +1,38 @@
+# port 결정 => default 8080 => 9090
+# Eginx: 80 / Jenkins: 8080 => port 번호 충돌 안나게 변경
+server:
+  port: 9091
+  servlet:
+    context-path: /
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/recipe
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    prefix: classpath:templates/
+    suffix: .html
+    mode: HTML
+  ai:
+    google:
+      genai:
+        api-key: ${GEN_KEY}
+        embedding:
+          api-key: ${GEN_KEY}
+          text:
+            options:
+              model: gemini-embedding-001
+              dimensions: 768
+          project-id: gen-lang-client-0069069343
+    model:
+      embedding:
+        text: google-genai
+mybatis:
+  type-aliases-package: com.sist.web.vo
+  mapper-locations: 
+    - classpath*:/mapper/postgres/*.xml
+  configuration:
+    map-underscore-to-camel-case: false
