@@ -30,6 +30,29 @@ pipeline {
 			}
 		}
 		
+		// 환경설정 파일 추가
+		stage('Create .env'){
+			steps{
+				withCredentials([
+					string(
+						credentialsId: 'post-url',
+						variable: 'POST_URL'
+					),
+					string(
+						credentialsId: 'gen-key',
+						variable: 'GEN_KEY'			
+					)
+				]) {
+					sh '''
+						SPRING_PROFILES_ACTIVE=prod > .env
+						POST_URL=${POST_URL} >> .env
+						GEN_KEY=${GEN_KEY} >> .env
+						chmod 600 .env
+					'''
+				}
+			}
+		}
+		
 		// gradlew build 전 permission 처리
 		stage('Gradlew permission'){
 			steps{
@@ -67,31 +90,6 @@ pipeline {
 				)]) {
 					sh '''
 						echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-					'''
-				}
-			}
-		}
-		
-		// 임시
-		stage('Create .env'){
-			steps{
-				withCredentials([
-					string(
-						credentialsId: 'post-url',
-						variable: 'POST_URL'
-					),
-					string(
-						credentialsId: 'gen-key',
-						variable: 'GEN_KEY'			
-					)
-				]) {
-					sh '''
-						cat > .env << EOF
-						SPRING_PROFILES_ACTIVE=prod
-						POST_URL=${POST_URL}
-						GEN_KEY=${GEN_KEY}
-						EOF
-							chmod 600 .env
 					'''
 				}
 			}
