@@ -76,7 +76,7 @@ pipeline {
 		stage('Docker Build'){
 			steps {
 				sh '''
-				     docker build -t chaijewon/ai-app:latest .
+				     docker build -t skc4234/ai-app:latest .
 				   '''
 			}
 		}
@@ -98,7 +98,7 @@ pipeline {
 		stage('Docker Push'){
 			steps {
 				sh '''
-				    docker push chaijewon/ai-app:latest
+				    docker push skc4234/ai-app:latest
 				   '''
 			}
 		}
@@ -122,7 +122,7 @@ pipeline {
 		stage('DockerHub Pull'){
 			steps {
 				sh '''
-				    docker pull chaijewon/ai-app:latest
+				    docker pull skc4234/ai-app:latest
 				   '''
 			}
 		}
@@ -130,7 +130,7 @@ pipeline {
 		stage('Docker Run'){
 			steps {
 				sh '''
-				     docker run -d --name ai-app -p 9090:9090 --env-file .env chaijewon/ai-app:latest
+				     docker run -d --name ai-app -p 9090:9090 --env-file .env skc4234/ai-app:latest
 				   '''
 			}
 		}
