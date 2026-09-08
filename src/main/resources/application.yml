@@ -1,7 +1,7 @@
 # port 결정 => default 8080 => 9090
 # Eginx: 80 / Jenkins: 8080 => port 번호 충돌 안나게 변경
 server:
-  port: 9091
+  port: 9090
   servlet:
     context-path: /
 spring:
