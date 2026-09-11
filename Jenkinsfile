@@ -50,7 +50,6 @@ pipeline {
 			steps {
 				sh '''
 					java -version
-					./gradlew --version
 				'''
 			}
 		}
@@ -60,6 +59,7 @@ pipeline {
 			steps {
 				sh '''
 					chmod +x gradlew
+					./gradlew --version
 				'''
 			}
 		}
