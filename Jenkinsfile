@@ -27,13 +27,13 @@ pipeline {
 	*/
 	agent any
 	environment {
-		APP_DIR="~/app"
+		LOCAL_APP_DIR="~/app"
 		JAR_NAME="SpringRecipeAIProject-0.0.1-SNAPSHOT.jar"
 		DOCKER_IMAGE = "skc4234/ai-app:latest"
 		// AWS EC2
 		SERVER_USER="ubuntu"
 		SERVER_IP="43.203.176.171"
-		APP_DIR="/home/ubuntu/app"
+		SERVER_APP_DIR="/home/ubuntu/app"
 	}
 	// 우분투 (AWS) 명령어 수행
 	stages {
