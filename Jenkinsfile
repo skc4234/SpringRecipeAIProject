@@ -27,13 +27,12 @@ pipeline {
 	*/
 	agent any
 	environment {
-		LOCAL_APP_DIR="~/app"
 		JAR_NAME="SpringRecipeAIProject-0.0.1-SNAPSHOT.jar"
 		DOCKER_IMAGE = "skc4234/ai-app:latest"
 		// AWS EC2
 		SERVER_USER="ubuntu"
 		SERVER_IP="43.203.176.171"
-		SERVER_APP_DIR="/home/ubuntu/app"
+		APP_DIR="/home/ubuntu/app"
 	}
 	// 우분투 (AWS) 명령어 수행
 	stages {
@@ -59,7 +58,6 @@ pipeline {
 			steps {
 				sh '''
 					chmod +x gradlew
-					./gradlew --version
 				'''
 			}
 		}
@@ -183,7 +181,7 @@ pipeline {
 				]){
 					sh '''
 						ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no ubuntu@43.203.176.171 "mkdir -p /home/ubuntu/app"
-				        scp -i "$SSH_KEY" -o StrictHostKeyChecking=no ubuntu@43.203.176.171 docker-compose.yml ubuntu@43.203.176.171:/home/ubuntu/app/docker-compose.yml
+				        scp -i "$SSH_KEY" -o StrictHostKeyChecking=no docker-compose.yml ubuntu@43.203.176.171:/home/ubuntu/app/docker-compose.yml
 						
 					'''
 				}
